@@ -10,22 +10,32 @@ if (NOT SOFTFP)
   set(FLOAT_ABI_SUFFIX "hf")
 endif()
 
-set(CMAKE_C_COMPILER    arm-linux-gnueabi${FLOAT_ABI_SUFFIX}-gcc-${GCC_COMPILER_VERSION})
-set(CMAKE_CXX_COMPILER  arm-linux-gnueabi${FLOAT_ABI_SUFFIX}-g++-${GCC_COMPILER_VERSION})
-set(ARM_LINUX_SYSROOT /usr/arm-linux-gnueabi${FLOAT_ABI_SUFFIX} CACHE PATH "ARM cross compilation system root")
+#set(CMAKE_C_COMPILER    arm-linux-gnueabi${FLOAT_ABI_SUFFIX}-gcc-${GCC_COMPILER_VERSION})
+#set(CMAKE_CXX_COMPILER  arm-linux-gnueabi${FLOAT_ABI_SUFFIX}-g++-${GCC_COMPILER_VERSION})
+#set(ARM_LINUX_SYSROOT /usr/arm-linux-gnueabi${FLOAT_ABI_SUFFIX} CACHE PATH "ARM cross compilation system root")
 
-set(CMAKE_CXX_FLAGS           ""                    CACHE STRING "c++ flags")
-set(CMAKE_C_FLAGS             ""                    CACHE STRING "c flags")
+set(CMAKE_AR            /usr/local/linaro-multilib-2014.06-gcc4.9/bin/arm-linux-gnueabihf-ar CACHE FILEPATH "ARM AR")
+set(CMAKE_AS            /usr/local/linaro-multilib-2014.06-gcc4.9/bin/arm-linux-gnueabihf-as )
+set(CMAKE_LD            /usr/local/linaro-multilib-2014.06-gcc4.9/bin/arm-linux-gnueabihf-ld )
+set(CMAKE_RANLIB            /usr/local/linaro-multilib-2014.06-gcc4.9/bin/arm-linux-gnueabihf-ranlib)
+set(CMAKE_C_COMPILER    /usr/local/linaro-multilib-2014.06-gcc4.9/bin/arm-linux-gnueabihf-gcc)
+set(CMAKE_CXX_COMPILER  /usr/local/linaro-multilib-2014.06-gcc4.9/bin/arm-linux-gnueabihf-g++)
+set(ARM_LINUX_SYSROOT  /usr/local/linaro-multilib-2014.06-gcc4.9/arm-linux-gnueabihf/libc CACHE PATH "ARM cross compilation system root")
+
+
+
+set(CMAKE_CXX_FLAGS           "--sysroot=/usr/local/linaro-multilib-2014.06-gcc4.9/arm-linux-gnueabihf/libc"                    CACHE STRING "c++ flags")
+set(CMAKE_C_FLAGS             "--sysroot=/usr/local/linaro-multilib-2014.06-gcc4.9/arm-linux-gnueabihf/libc"                    CACHE STRING "c flags")
 set(CMAKE_SHARED_LINKER_FLAGS ""                    CACHE STRING "shared linker flags")
 set(CMAKE_MODULE_LINKER_FLAGS ""                    CACHE STRING "module linker flags")
 set(CMAKE_EXE_LINKER_FLAGS    "-Wl,-z,nocopyreloc"  CACHE STRING "executable linker flags")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mthumb -fdata-sections -Wa,--noexecstack -fsigned-char -Wno-psabi")
-set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -mthumb -fdata-sections -Wa,--noexecstack -fsigned-char -Wno-psabi")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mthumb -mfloat-abi=hard -fdata-sections -Wa,--noexecstack -fsigned-char -Wno-psabi")
+set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -mthumb -mfloat-abi=hard -fdata-sections -Wa,--noexecstack -fsigned-char -Wno-psabi")
 
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--fix-cortex-a8 -Wl,--no-undefined -Wl,--gc-sections -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now ${CMAKE_SHARED_LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--fix-cortex-a8 -Wl,--no-undefined -Wl,--gc-sections -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now ${CMAKE_MODULE_LINKER_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS    "-Wl,--fix-cortex-a8 -Wl,--no-undefined -Wl,--gc-sections -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now ${CMAKE_EXE_LINKER_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS    "--sysroot=/usr/local/linaro-multilib-2014.06-gcc4.9/arm-linux-gnueabihf/libc -mfloat-abi=hard -Wl,--fix-cortex-a8 -Wl,--no-undefined -Wl,--gc-sections -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now ${CMAKE_EXE_LINKER_FLAGS}")
 
 if(USE_NEON)
   message(WARNING "You use obsolete variable USE_NEON to enable NEON instruction set. Use -DENABLE_NEON=ON instead." )
@@ -37,13 +47,13 @@ endif()
 
 set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${ARM_LINUX_SYSROOT})
 
-if(EXISTS ${CUDA_TOOLKIT_ROOT_DIR})
-    set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${CUDA_TOOLKIT_ROOT_DIR})
-endif()
+#if(EXISTS ${CUDA_TOOLKIT_ROOT_DIR})
+#    set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${CUDA_TOOLKIT_ROOT_DIR})
+#endif()
 
 set( CMAKE_SKIP_RPATH TRUE CACHE BOOL "If set, runtime paths are not added when using shared libraries." )
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
 
 # macro to find programs on the host OS
